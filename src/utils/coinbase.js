@@ -4,10 +4,14 @@ const setupCoinbaseWallet = () => {
   const walletLink = new CoinbaseWalletSDK({
     appName: "My App",
     appLogoUrl: "https://example.com/logo.png",
-    darkMode: false
+    appChainIds: [1],
   });
 
-  const provider = walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/a7369cfe951548d7a4fe0938ff4f24a9", 1);
+  const provider = walletLink.makeWeb3Provider({
+    options: 'eoaOnly',
+  });
+
+  // keysUrl: "https://mainnet.infura.io/v3/a7369cfe951548d7a4fe0938ff4f24a9",
 
   return {
     walletLink,
