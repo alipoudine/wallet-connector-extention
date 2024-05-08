@@ -28,27 +28,35 @@ export const createWalletManager = () => {
 
     const coinbaseConnect = async () => {
         try {
-            console.log(coinbase.walletLink.getQrUrl())
-            coinbase.provider.enable().then(async (data) => {
-                console.log(data)
-                let chainId = await coinbaseChainId()
-                console.log("======================================================")
-                console.log(chainId)
-                console.log("======================================================")
-            })
-            // const accounts = await coinbase.provider.request({ method: 'eth_requestAccounts' });
-            // if (!accounts || accounts.length <= 0) {
-            //     throw new Error("wallet address not selected");
-            // }
+            console.log("QR ====> ", coinbase.walletLink.getQrUrl())
 
-            // const account = getNormalizeAddress(accounts);
-            // console.log("User's address : ", account);
+            const accounts = await coinbase.provider.request({ method: 'eth_requestAccounts' });
+            if (!accounts || accounts.length <= 0) {
+                throw new Error("wallet address not selected");
+            }
+
+            let chainId = await coinbaseChainId()
+            console.log("======================================================")
+            console.log(chainId)
+            console.log("======================================================")
+
+            const account = getNormalizeAddress(accounts);
+            console.log("User's address : ", account);
             return { account: "" };
         } catch (error) {
-            console.log("error while connect", e);
+            console.log("error while connect", error);
             return { error }
         }
     };
+
+    const coinbaseDisconnect = async () => {
+        try {
+            coinbase.walletLink.disconnect()
+        } catch (error) {
+            console.log("error while disconnecting wallet", error);
+            return { error }
+        }
+    }
 
     const coinbaseChainId = async () => {
         // const web3 = new Web3(coinbase.provider);
@@ -81,10 +89,6 @@ export const createWalletManager = () => {
         } catch (error) {
             console.log("error while connect", error);
         }
-    }
-
-    const coinbaseDisconnect = async () => {
-
     }
 
     const coinbasePayment = async (from, to, value) => {
@@ -236,12 +240,13 @@ export const createWalletManager = () => {
 
     return {
         coinbaseConnect,
+        coinbaseDisconnect,
         coinbaseChainId,
         getMetamaskProvider,
         coinbasePersonalSign,
-        coinbaseDisconnect,
         coinbasePayment,
         coinbaseContractCall,
+        //
         metamaskConnect,
         metamaskPersonalSign,
         metamaskDisconnect,
