@@ -28,8 +28,6 @@ export const createWalletManager = () => {
 
     const coinbaseConnect = async () => {
         try {
-            console.log("QR ====> ", coinbase.walletLink.getQrUrl())
-
             const accounts = await coinbase.provider.request({ method: 'eth_requestAccounts' });
             if (!accounts || accounts.length <= 0) {
                 throw new Error("wallet address not selected");
