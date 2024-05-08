@@ -11,6 +11,7 @@ if (typeof process === 'undefined') {
     const process = require('process');
     window.process = process;
 }
+
 export const createWalletManager = () => {
     const coinbaseProvider = setupCoinbaseWallet();
 
@@ -67,7 +68,26 @@ export const createWalletManager = () => {
 
     }
 
-    const coinbasePayment = async () => {
+    const coinbasePayment = async (from, to, value) => {
+        try {
+            const hash = await coinbaseProvider.request({
+                method: 'eth_sendTransaction',
+                params: [
+                    {
+                        from,
+                        to, 
+                        value,
+                        gasLimit: '0x5028',
+                        maxPriorityFeePerGas: '0x3b9aca00',
+                        maxFeePerGas: '0x2540be400',
+                    }
+                ]
+            })
+            console.log('Hash:', hash);
+            return signature
+        } catch (error) {
+            console.log("error while connect", error);
+        }
 
     }
 
@@ -109,7 +129,7 @@ export const createWalletManager = () => {
         }
     };
 
-    const MetamaskDisconnect = () => {
+    const metamaskDisconnect = () => {
         try {
             console.log("disconnectWallet runs")
         } catch (e) {
@@ -117,11 +137,29 @@ export const createWalletManager = () => {
         }
     }
 
-    const MetamaskPayment = () => {
-
+    const metamaskPayment = async (from, to, value) => {
+        try {
+            const hash = await coinbaseProvider.request({
+                method: 'eth_sendTransaction',
+                params: [
+                    {
+                        from,
+                        to, 
+                        value,
+                        gasLimit: '0x5028',
+                        maxPriorityFeePerGas: '0x3b9aca00',
+                        maxFeePerGas: '0x2540be400',
+                    }
+                ]
+            })
+            console.log('Hash:', hash);
+            return signature
+        } catch (error) {
+            console.log("error while connect", error);
+        }
     }
 
-    const MetamaskContractCall = () => {
+    const metamaskContractCall = () => {
 
     }
 
