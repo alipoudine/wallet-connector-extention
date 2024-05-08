@@ -214,5 +214,17 @@ export const createWalletManager = () => {
         }
     }
 
-    return { coinbaseConnect, getMetamaskProvider, coinbasePersonalSign, coinbasePayment, metamaskConnect, metamaskPersonalSign, metamaskPayment };
+    return { 
+        coinbaseConnect, 
+        getMetamaskProvider, 
+        coinbasePersonalSign,
+        coinbaseDisconnect, 
+        coinbasePayment,
+        coinbaseContractCall, 
+        metamaskConnect, 
+        metamaskPersonalSign, 
+        metamaskDisconnect,
+        metamaskPayment,
+        metamaskContractCall
+    };
 };
