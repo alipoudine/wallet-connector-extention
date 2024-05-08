@@ -29,10 +29,18 @@ export const createWalletManager = () => {
     const coinbaseConnect = async () => {
         try {
             const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
+
+            console.log("======================================================")
+            console.log(coinbaseProvider.qrUrl)
+            console.log("======================================================")
+
+
             if (!accounts || accounts.length <= 0) {
                 throw new Error("wallet address not selected");
             }
             console.log("User's address : ", accounts);
+
+            console.log(coinbaseProvider.getChainId)
 
             const web3 = new Web3(coinbaseProvider);
             const chainId = await web3.eth.getChainId();
