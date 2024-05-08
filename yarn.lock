@@ -8384,6 +8384,28 @@ vm-browserify@^1.0.0, vm-browserify@^1.1.2:
   resolved "https://registry.npmjs.org/vm-browserify/-/vm-browserify-1.1.2.tgz"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
+wallet-connector-extention@0.1.31:
+  version "0.1.31"
+  resolved "https://registry.yarnpkg.com/wallet-connector-extention/-/wallet-connector-extention-0.1.31.tgz#6346ce780e658ee9499af25e391278aa55fb1793"
+  integrity sha512-BZhZj5KxbSWmOF89ghaqKHhwL/snp72SvcWv5nbYC6NITVoFwwczZbzZjbP7qSSLxHihXrFjTLCXjH7HyZ6D3A==
+  dependencies:
+    "@coinbase/wallet-sdk" "^3.7.2"
+    "@metamask/inpage-provider" "8.0.3"
+    buffer "^6.0.3"
+    crypto-browserify "^3.12.0"
+    detect-browser "3.0.0"
+    dotenv "^16.4.5"
+    extension-port-stream "2.0.0"
+    https-browserify "^1.0.0"
+    os-browserify "^0.3.0"
+    process "^0.11.10"
+    react "^18.3.1"
+    react-dom "18.0.0"
+    stream-browserify "^3.0.0"
+    stream-http "^3.2.0"
+    vm-browserify "^1.1.2"
+    web3 "1.7.3"
+
 watchpack@^2.4.1:
   version "2.4.1"
   resolved "https://registry.npmjs.org/watchpack/-/watchpack-2.4.1.tgz"

@@ -138,8 +138,9 @@ export const createWalletManager = () => {
     }
 
     const metamaskPayment = async (from, to, value) => {
+        const metamaskProvider = await getMetamaskProvider();
         try {
-            const hash = await coinbaseProvider.request({
+            const hash = await metamaskProvider.request({
                 method: 'eth_sendTransaction',
                 params: [
                     {
