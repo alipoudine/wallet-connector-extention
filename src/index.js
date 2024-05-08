@@ -1,6 +1,5 @@
 import { createMetaMaskProvider } from './utils/metamask';
 import { getNormalizeAddress } from './utils';
-import storage from './utils/storage';
 import setupCoinbaseWallet from './utils/coinbase';
 import Web3 from 'web3';
 import { Buffer } from 'buffer';
@@ -11,6 +10,7 @@ if (typeof process === 'undefined') {
     const process = require('process');
     window.process = process;
 }
+
 
 export const createWalletManager = () => {
     const coinbaseProvider = setupCoinbaseWallet();
@@ -28,34 +28,43 @@ export const createWalletManager = () => {
 
     const coinbaseConnect = async () => {
         try {
-            const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
+            coinbaseProvider.enable().then(async (data) => {
+                console.log(data)
+                let chainId = await coinbaseChainId()
+                console.log("======================================================")
+                console.log(chainId)
+                console.log("======================================================")
+            })
+            // const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
+            // if (!accounts || accounts.length <= 0) {
+            //     throw new Error("wallet address not selected");
+            // }
 
-            console.log("======================================================")
-            console.log(coinbaseProvider.getQrUrl())
-            console.log("======================================================")
-            console.log(coinbaseProvider.getChainId())
-            console.log("======================================================")
-
-
-            if (!accounts || accounts.length <= 0) {
-                throw new Error("wallet address not selected");
-            }
-            console.log("User's address : ", accounts);
-
-
-            const web3 = new Web3(coinbaseProvider);
-            const chainId = await web3.eth.getChainId();
-            console.log("coinbase's chainId : ", chainId);
-
-            const account = getNormalizeAddress(accounts);
-            console.log("User's address : ", account);
-            storage.set('connected', { connected: true, wallet: 'coinbase' });
-            return { account, chainId };
-        } catch (e) {
+            // const account = getNormalizeAddress(accounts);
+            // console.log("User's address : ", account);
+            return { account: "" };
+        } catch (error) {
             console.log("error while connect", e);
-            throw e;
+            return { error }
         }
     };
+
+    const coinbaseChainId = async () => {
+        // const web3 = new Web3(coinbaseProvider);
+        // const chainId = await web3.eth.getChainId();
+        // console.log("coinbase's chainId : ", chainId);
+
+        try {
+            const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
+            if (!chainId) {
+                throw new Error("chainId not detected");
+            }
+            return { chainId };
+        } catch (error) {
+            console.log("error while connect", e);
+            return { error }
+        }
+    }
 
     const coinbasePersonalSign = async (message, account) => {
         try {
@@ -84,7 +93,7 @@ export const createWalletManager = () => {
                 params: [
                     {
                         from,
-                        to, 
+                        to,
                         value,
                         gasLimit: '0x5028',
                         maxPriorityFeePerGas: '0x3b9aca00',
@@ -154,7 +163,7 @@ export const createWalletManager = () => {
                 params: [
                     {
                         from,
-                        to, 
+                        to,
                         value,
                         gasLimit: '0x5028',
                         maxPriorityFeePerGas: '0x3b9aca00',
@@ -224,17 +233,18 @@ export const createWalletManager = () => {
         }
     }
 
-    return { 
-        coinbaseConnect, 
-        getMetamaskProvider, 
+    return {
+        coinbaseConnect,
+        coinbaseChainId,
+        getMetamaskProvider,
         coinbasePersonalSign,
-        coinbaseDisconnect, 
+        coinbaseDisconnect,
         coinbasePayment,
-        coinbaseContractCall, 
-        metamaskConnect, 
-        metamaskPersonalSign, 
+        coinbaseContractCall,
+        metamaskConnect,
+        metamaskPersonalSign,
         metamaskDisconnect,
         metamaskPayment,
         metamaskContractCall
     };
-};
+}
