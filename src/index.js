@@ -13,7 +13,7 @@ if (typeof process === 'undefined') {
 
 
 export const createWalletManager = () => {
-    const coinbaseProvider = setupCoinbaseWallet();
+    const coinbase = setupCoinbaseWallet();
 
     const getMetamaskProvider = async () => {
         if (window.ethereum) {
@@ -28,14 +28,15 @@ export const createWalletManager = () => {
 
     const coinbaseConnect = async () => {
         try {
-            coinbaseProvider.enable().then(async (data) => {
+            console.log(coinbase.walletLink.getQrUrl())
+            coinbase.provider.enable().then(async (data) => {
                 console.log(data)
                 let chainId = await coinbaseChainId()
                 console.log("======================================================")
                 console.log(chainId)
                 console.log("======================================================")
             })
-            // const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
+            // const accounts = await coinbase.provider.request({ method: 'eth_requestAccounts' });
             // if (!accounts || accounts.length <= 0) {
             //     throw new Error("wallet address not selected");
             // }
@@ -50,12 +51,12 @@ export const createWalletManager = () => {
     };
 
     const coinbaseChainId = async () => {
-        // const web3 = new Web3(coinbaseProvider);
+        // const web3 = new Web3(coinbase.provider);
         // const chainId = await web3.eth.getChainId();
         // console.log("coinbase's chainId : ", chainId);
 
         try {
-            const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
+            const chainId = await coinbase.provider.request({ method: 'eth_chainId' })
             if (!chainId) {
                 throw new Error("chainId not detected");
             }
@@ -71,7 +72,7 @@ export const createWalletManager = () => {
             const checkSumAddress = Web3.utils.toChecksumAddress(account)
             const messageHash = Web3.utils.utf8ToHex(message)
 
-            const signature = await coinbaseProvider.request({
+            const signature = await coinbase.provider.request({
                 method: 'personal_sign',
                 params: [messageHash, checkSumAddress]
             })
@@ -88,7 +89,7 @@ export const createWalletManager = () => {
 
     const coinbasePayment = async (from, to, value) => {
         try {
-            const hash = await coinbaseProvider.request({
+            const hash = await coinbase.provider.request({
                 method: 'eth_sendTransaction',
                 params: [
                     {

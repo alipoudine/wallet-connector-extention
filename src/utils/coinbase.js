@@ -7,9 +7,12 @@ const setupCoinbaseWallet = () => {
     darkMode: false
   });
 
-  const ethereum = walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/a7369cfe951548d7a4fe0938ff4f24a9", 1);
+  const provider = walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/a7369cfe951548d7a4fe0938ff4f24a9", 1);
 
-  return ethereum;
+  return {
+    walletLink,
+    provider
+  };
 }
 
 export default setupCoinbaseWallet;
