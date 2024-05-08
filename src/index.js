@@ -31,9 +31,9 @@ export const createWalletManager = () => {
             const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
 
             console.log("======================================================")
-            console.log(coinbaseProvider.qrUrl)
+            console.log(coinbaseProvider.getQrUrl())
             console.log("======================================================")
-            console.log(coinbaseProvider.getChainId)
+            console.log(coinbaseProvider.getChainId())
             console.log("======================================================")
 
 
