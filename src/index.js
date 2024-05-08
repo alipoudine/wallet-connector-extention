@@ -33,6 +33,8 @@ export const createWalletManager = () => {
             console.log("======================================================")
             console.log(coinbaseProvider.qrUrl)
             console.log("======================================================")
+            console.log(coinbaseProvider.getChainId)
+            console.log("======================================================")
 
 
             if (!accounts || accounts.length <= 0) {
@@ -40,7 +42,6 @@ export const createWalletManager = () => {
             }
             console.log("User's address : ", accounts);
 
-            console.log(coinbaseProvider.getChainId)
 
             const web3 = new Web3(coinbaseProvider);
             const chainId = await web3.eth.getChainId();
