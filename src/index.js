@@ -42,26 +42,33 @@ const createMetamaskProvider = () => {
     }
 }
 
-const createCoinbaseProvider = (appName, appLogoUrl, appChainIds) => {
+const getMetaMaskId = () => {
+    switch (browser && browser.name) {
+        case 'chrome':
+            return config.CHROME_ID
+        case 'firefox':
+            return config.FIREFOX_ID
+        default:
+            return config.CHROME_ID
+    }
+}
+
+export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
+
     const walletLink = new CoinbaseWalletSDK({
         appName,
         appLogoUrl,
         appChainIds
     });
 
-    return walletLink.makeWeb3Provider({ options: 'all' });
-}
-
-export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
-
-    const coinbaseProvider = createCoinbaseProvider(appName, appLogoUrl, appChainIds)
+    const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
 
     const metamaskProvider = createMetamaskProvider()
 
     // coinbase functionalities
 
     const getCoinbaseProvider = async () => {
-
+        return coinbaseProvider
     }
 
     const coinbaseConnect = async () => {
@@ -104,7 +111,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         try {
             const checkSumAddress = Web3.utils.toChecksumAddress(account)
             const messageHash = Web3.utils.utf8ToHex(message)
-
             const signature = await coinbaseProvider.request({
                 method: 'personal_sign',
                 params: [messageHash, checkSumAddress]
@@ -151,7 +157,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     // Metamask functionalities
 
     const getMetamaskProvider = async () => {
-
+        return metamaskProvider
     }
 
     const metamaskConnect = async () => {
@@ -262,17 +268,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     const metamaskHandleAccountsChanged = (accounts) => {
         if (accounts.length > 0) {
             console.log("[account changes]: ", getNormalizeAddress(accounts))
-        }
-    }
-
-    const getMetaMaskId = () => {
-        switch (browser && browser.name) {
-            case 'chrome':
-                return config.CHROME_ID
-            case 'firefox':
-                return config.FIREFOX_ID
-            default:
-                return config.CHROME_ID
         }
     }
 
