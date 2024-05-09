@@ -1,52 +1,16 @@
-import { MetaMaskInpageProvider } from '@metamask/inpage-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-import PortStream from 'extension-port-stream'
-import { detect } from 'detect-browser'
 import { getNormalizeAddress } from './utils';
 import Web3 from 'web3';
 import { Buffer } from 'buffer';
+const createMetaMaskProvider = require('metamask-extension-provider')
 
-const browser = detect()
+
 window.Buffer = Buffer;
-
 if (typeof process === 'undefined') {
     const process = require('process');
     window.process = process;
 }
 
-const config = {
-    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
-    "FIREFOX_ID": "webextension@metamask.io"
-}
-
-const createMetamaskProvider = () => {
-    try {
-        if (window.ethereum) {
-            console.log('found window.ethereum>>');
-            return window.ethereum;
-        } else {
-            console.log("not found window.ethereum>>")
-            let currentMetaMaskId = getMetaMaskId()
-            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
-            const pluginStream = new PortStream(metamaskPort)
-            return new MetaMaskInpageProvider(pluginStream)
-        }
-    } catch (error) {
-        console.dir(`Metamask connect error `, error)
-        throw error
-    }
-}
-
-const getMetaMaskId = () => {
-    switch (browser && browser.name) {
-        case 'chrome':
-            return config.CHROME_ID
-        case 'firefox':
-            return config.FIREFOX_ID
-        default:
-            return config.CHROME_ID
-    }
-}
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     const walletLink = new CoinbaseWalletSDK({
@@ -54,11 +18,10 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         appLogoUrl,
         appChainIds
     });
-    
+
     const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
 
-    const metamaskProvider = createMetamaskProvider()
-
+    const metamaskProvider = createMetaMaskProvider()
     // coinbase functionalities
 
     const getCoinbaseProvider = async () => {
@@ -104,6 +67,19 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
+    const coinbaseNetworkChange = async (chainId,) => {
+        try {
+            // Request the wallet to switch or add the network
+            await ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                    chainId: chainId,
+                }],
+            });
+        } catch (error) {
+            console.error('Failed to change network', error);
+        }
+    }
     const coinbasePersonalSign = async (message, account) => {
         try {
             const checkSumAddress = Web3.utils.toChecksumAddress(account)
@@ -303,6 +279,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         coinbaseConnect,
         coinbaseDisconnect,
         coinbaseChainId,
+        coinbaseNetworkChange,
         coinbasePersonalSign,
         coinbasePayment,
         coinbaseContractCall,
