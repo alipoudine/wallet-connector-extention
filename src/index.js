@@ -146,7 +146,20 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     const coinbaseContractCall = async () => {
         try {
-
+            const hash = await coinbaseProvider.request({
+                method: 'eth_sendTransaction',
+                params: [
+                    {
+                        from,
+                        to,
+                        value,
+                        gasLimit: '0x5028',
+                        maxPriorityFeePerGas: '0x3b9aca00',
+                        maxFeePerGas: '0x2540be400',
+                    }
+                ]
+            })
+            return hash
         } catch (error) {
             console.log("error coinbase contract call : ", error);
             return error
@@ -234,9 +247,22 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
-    const metamaskContractCall = () => {
+    const metamaskContractCall = async () => {
         try {
-
+            const hash = await metamaskProvider.request({
+                method: 'eth_sendTransaction',
+                params: [
+                    {
+                        from,
+                        to,
+                        value,
+                        gasLimit: '0x5028',
+                        maxPriorityFeePerGas: '0x3b9aca00',
+                        maxFeePerGas: '0x2540be400',
+                    }
+                ]
+            })
+            return hash
         } catch (error) {
             console.log("error metamask contract call : ", error);
             return error
