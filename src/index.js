@@ -90,7 +90,10 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     const coinbaseChainId = async () => {
         try {
-            const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
+
+            const web3 = new Web3(coinbaseProvider);
+            const chainId = await web3.eth.getChainId();
+            // const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
             if (!chainId) {
                 throw new Error("chainId not detected");
             }
@@ -183,7 +186,10 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     const metamaskChainId = async () => {
         try {
-            const chainId = await metamaskProvider.request({ method: 'eth_chainId' })
+            const web3 = new Web3(metamaskProvider);
+            const chainId = await web3.eth.getChainId();
+
+            // const chainId = await metamaskProvider.request({ method: 'eth_chainId' })
             if (!chainId) {
                 throw new Error("chainId not detected");
             }
@@ -210,9 +216,10 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     };
 
-    const metamaskDisconnect = () => {
+    const metamaskDisconnect = async () => {
         try {
-            console.log("disconnectWallet runs")
+            console.log("disconnect wallet runs")
+            await metamaskProvider.disconnect()
         } catch (error) {
             console.log(error);
             return error
