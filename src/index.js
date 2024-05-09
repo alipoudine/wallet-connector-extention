@@ -1,10 +1,10 @@
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import { getNormalizeAddress } from './utils';
 import Web3 from 'web3';
+import createMetaMaskProvider from 'metamask-extension-provider'
+
+
 import { Buffer } from 'buffer';
-const createMetaMaskProvider = require('metamask-extension-provider')
-
-
 window.Buffer = Buffer;
 if (typeof process === 'undefined') {
     const process = require('process');
