@@ -1,9 +1,11 @@
-import { createMetaMaskProvider } from './utils/metamask';
+import { MetaMaskInpageProvider } from '@metamask/inpage-provider'
+import PortStream from 'extension-port-stream'
+import { detect } from 'detect-browser'
 import { getNormalizeAddress } from './utils';
-import setupCoinbaseWallet from './utils/coinbase';
 import Web3 from 'web3';
 import { Buffer } from 'buffer';
 
+const browser = detect()
 window.Buffer = Buffer;
 
 if (typeof process === 'undefined') {
@@ -11,36 +13,32 @@ if (typeof process === 'undefined') {
     window.process = process;
 }
 
+const config = {
+    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
+    "FIREFOX_ID": "webextension@metamask.io"
+}
 
-export const createWalletManager = () => {
-    const coinbase = setupCoinbaseWallet();
 
-    const getMetamaskProvider = async () => {
-        if (window.ethereum) {
-            console.log('found window.ethereum>>');
-            return window.ethereum;
-        } else {
-            console.log("not found window.ethereum>>")
-            const provider = createMetaMaskProvider();
-            return provider;
-        }
-    }
+export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
+    const walletLink = new CoinbaseWalletSDK({
+        appName,
+        appLogoUrl,
+        appChainIds
+    });
+
+    const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
+
+    const metamaskProvider = getMetamaskProvider()
 
     const coinbaseConnect = async () => {
         try {
-            const accounts = await coinbase.provider.request({ method: 'eth_requestAccounts' });
+            const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
             if (!accounts || accounts.length <= 0) {
                 throw new Error("wallet address not selected");
             }
-
-            let chainId = await coinbaseChainId()
-            console.log("======================================================")
-            console.log(chainId)
-            console.log("======================================================")
-
             const account = getNormalizeAddress(accounts);
             console.log("User's address : ", account);
-            return { account: "" };
+            return { account };
         } catch (error) {
             console.log("error while connect", error);
             return { error }
@@ -49,7 +47,7 @@ export const createWalletManager = () => {
 
     const coinbaseDisconnect = async () => {
         try {
-            coinbase.walletLink.disconnect()
+            walletLink.disconnect()
         } catch (error) {
             console.log("error while disconnecting wallet", error);
             return { error }
@@ -57,12 +55,12 @@ export const createWalletManager = () => {
     }
 
     const coinbaseChainId = async () => {
-        // const web3 = new Web3(coinbase.provider);
+        // const web3 = new Web3(coinbaseProvider);
         // const chainId = await web3.eth.getChainId();
         // console.log("coinbase's chainId : ", chainId);
 
         try {
-            const chainId = await coinbase.provider.request({ method: 'eth_chainId' })
+            const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
             if (!chainId) {
                 throw new Error("chainId not detected");
             }
@@ -78,7 +76,7 @@ export const createWalletManager = () => {
             const checkSumAddress = Web3.utils.toChecksumAddress(account)
             const messageHash = Web3.utils.utf8ToHex(message)
 
-            const signature = await coinbase.provider.request({
+            const signature = await coinbaseProvider.request({
                 method: 'personal_sign',
                 params: [messageHash, checkSumAddress]
             })
@@ -91,7 +89,7 @@ export const createWalletManager = () => {
 
     const coinbasePayment = async (from, to, value) => {
         try {
-            const hash = await coinbase.provider.request({
+            const hash = await coinbaseProvider.request({
                 method: 'eth_sendTransaction',
                 params: [
                     {
@@ -117,7 +115,6 @@ export const createWalletManager = () => {
     }
 
     const metamaskConnect = async () => {
-        const metamaskProvider = await getMetamaskProvider();
         console.log("connectWallet runs....")
         try {
             const [accounts, chainId] = await getMetamaskAccounts(metamaskProvider);
@@ -133,7 +130,6 @@ export const createWalletManager = () => {
     }
 
     const metamaskPersonalSign = async (message, account) => {
-        const metamaskProvider = await getMetamaskProvider();
         try {
             const checkSumAddress = Web3.utils.toChecksumAddress(account)
             const messageHash = Web3.utils.utf8ToHex(message)
@@ -159,7 +155,6 @@ export const createWalletManager = () => {
     }
 
     const metamaskPayment = async (from, to, value) => {
-        const metamaskProvider = await getMetamaskProvider();
         try {
             const hash = await metamaskProvider.request({
                 method: 'eth_sendTransaction',
@@ -186,7 +181,6 @@ export const createWalletManager = () => {
     }
 
     const getMetamaskAccounts = async () => {
-        const metamaskProvider = await getMetamaskProvider();
         console.log("metamask provider =====> ", metamaskProvider)
         if (metamaskProvider) {
             const [accounts, chainId] = await Promise.all([
@@ -200,7 +194,6 @@ export const createWalletManager = () => {
     }
 
     const metamaskSubscribeToEvents = async () => {
-        const metamaskProvider = await getMetamaskProvider();
         if (metamaskProvider) {
             // metamaskProvider.on(EthereumEvents.CHAIN_CHANGED, handleChainChanged);
             // metamaskProvider.on(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged);
@@ -210,7 +203,6 @@ export const createWalletManager = () => {
     }
 
     const metamaskUnsubscribeToEvents = async () => {
-        const metamaskProvider = await getMetamaskProvider();
         if (metamaskProvider) {
             // metamaskProvider.removeListener(EthereumEvents.CHAIN_CHANGED, handleChainChanged);
             // metamaskProvider.removeListener(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged);
@@ -236,11 +228,46 @@ export const createWalletManager = () => {
         }
     }
 
+    const getMetamaskProvider = async () => {
+        if (window.ethereum) {
+            console.log('found window.ethereum>>');
+            return window.ethereum;
+        } else {
+            console.log("not found window.ethereum>>")
+            const provider = createMetaMaskProvider();
+            return provider;
+        }
+    }
+
+    const createMetaMaskProvider = () => {
+        let provider
+        try {
+            let currentMetaMaskId = getMetaMaskId()
+            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
+            const pluginStream = new PortStream(metamaskPort)
+            provider = new MetaMaskInpageProvider(pluginStream)
+        } catch (e) {
+            console.dir(`Metamask connect error `, e)
+            throw e
+        }
+        return provider
+    }
+
+    const getMetaMaskId = () => {
+        switch (browser && browser.name) {
+            case 'chrome':
+                return config.CHROME_ID
+            case 'firefox':
+                return config.FIREFOX_ID
+            default:
+                return config.CHROME_ID
+        }
+    }
+
     return {
         coinbaseConnect,
         coinbaseDisconnect,
         coinbaseChainId,
-        getMetamaskProvider,
         coinbasePersonalSign,
         coinbasePayment,
         coinbaseContractCall,
