@@ -24,18 +24,41 @@ const config = {
 // handle chainId 
 // 
 
+const getMetamaskProvider = () => {
+    try {
+        if (window.ethereum) {
+            console.log('found window.ethereum>>');
+            return window.ethereum;
+        } else {
+            console.log("not found window.ethereum>>")
+            let currentMetaMaskId = getMetaMaskId()
+            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
+            const pluginStream = new PortStream(metamaskPort)
+            return new MetaMaskInpageProvider(pluginStream)
+        }
+    } catch (error) {
+        console.dir(`Metamask connect error `, error)
+        throw error
+    }
+}
+
+const walletLink = new CoinbaseWalletSDK({
+    appName,
+    appLogoUrl,
+    appChainIds
+});
+
+const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
+
+const metamaskProvider = getMetamaskProvider()
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
-    const walletLink = new CoinbaseWalletSDK({
-        appName,
-        appLogoUrl,
-        appChainIds
-    });
-
-    const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
-    const metamaskProvider = getMetamaskProvider()
 
     // coinbase functionalities
+
+    const getCoinbaseProvider = async ()=> {
+        
+    }
 
     const coinbaseConnect = async () => {
         try {
@@ -120,6 +143,13 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
+
+    // Metamask functionalities
+
+    const getMetamaskProvider = async ()=> {
+
+    }
+
     const metamaskConnect = async () => {
         try {
             const accounts = metamaskProvider.request({ method: 'eth_requestAccounts' })
@@ -133,8 +163,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
             return error
         }
     }
-
-    // Metamask functionalities
 
     const metamaskChainId = async () => {
         try {
@@ -223,7 +251,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
-
     const metamaskHandleChainChanged = (chainId) => {
         metamaskChainId = chainId;
     }
@@ -231,25 +258,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     const metamaskHandleAccountsChanged = (accounts) => {
         if (accounts.length > 0) {
             console.log("[account changes]: ", getNormalizeAddress(accounts))
-        }
-    }
-
-    const getMetamaskProvider = () => {
-        try {
-            if (window.ethereum) {
-                console.log('found window.ethereum>>');
-                return window.ethereum;
-            } else {
-                console.log("not found window.ethereum>>")
-
-                let currentMetaMaskId = getMetaMaskId()
-                const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
-                const pluginStream = new PortStream(metamaskPort)
-                return new MetaMaskInpageProvider(pluginStream)
-            }
-        } catch (error) {
-            console.dir(`Metamask connect error `, error)
-            throw error
         }
     }
 
@@ -265,15 +273,15 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     }
 
     return {
-        coinbaseProvider,
+        getCoinbaseProvider,
         coinbaseConnect,
         coinbaseDisconnect,
         coinbaseChainId,
         coinbasePersonalSign,
         coinbasePayment,
         coinbaseContractCall,
-        
-        metamaskProvider,
+
+        getMetamaskProvider,
         metamaskConnect,
         metamaskDisconnect,
         metamaskChainId,
