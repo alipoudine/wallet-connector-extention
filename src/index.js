@@ -1,18 +1,9 @@
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-
-
-import { getNormalizeAddress } from './utils';
 import Web3 from 'web3';
 import { Buffer } from 'buffer';
-
-const { MetaMaskInpageProvider } = require('@metamask/inpage-provider')
-const PortStream = require('extension-port-stream')
-const { detect } = require('detect-browser')
-const browser = detect()
-const config = {
-    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
-    "FIREFOX_ID": "webextension@metamask.io"
-}
+import { getNormalizeAddress } from './utils';
+// import { createMetaMaskProvider } from 'metamask-extension-provider';
+import { createMetaMaskProvider } from './utils/metamask';
 
 window.Buffer = Buffer;
 
@@ -21,41 +12,10 @@ if (typeof process === 'undefined') {
     window.process = process;
 }
 
-
 // complete the functionalities
 // pass provider for listeners on connect network and ... in extension
 // handle chainId 
 // 
-
-const createMetamaskProvider = () => {
-    try {
-        if (window.ethereum) {
-            console.log('found window.ethereum>>');
-            return window.ethereum;
-        } else {
-            console.log("not found window.ethereum>>")
-            let currentMetaMaskId = getMetaMaskId()
-            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
-            const pluginStream = new PortStream(metamaskPort)
-            return new MetaMaskInpageProvider(pluginStream)
-        }
-    } catch (error) {
-        console.dir(`Metamask connect error `, error)
-        throw error
-    }
-}
-
-const getMetaMaskId = () => {
-    switch (browser && browser.name) {
-        case 'chrome':
-            return config.CHROME_ID
-        case 'firefox':
-            return config.FIREFOX_ID
-        default:
-            return config.CHROME_ID
-    }
-}
-
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     const walletLink = new CoinbaseWalletSDK({
@@ -66,7 +26,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     
     const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
 
-    const metamaskProvider = createMetamaskProvider()
+    const metamaskProvider = createMetaMaskProvider()
 
     // coinbase functionalities
 
