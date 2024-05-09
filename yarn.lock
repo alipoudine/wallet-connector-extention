@@ -1027,10 +1027,10 @@
     "@babel/helper-validator-identifier" "^7.24.5"
     to-fast-properties "^2.0.0"
 
-"@coinbase/wallet-sdk@4.0.0-rc.3":
-  version "4.0.0-rc.3"
-  resolved "https://registry.yarnpkg.com/@coinbase/wallet-sdk/-/wallet-sdk-4.0.0-rc.3.tgz#e5bc9587cd0799841417d7d1868b1831d5451321"
-  integrity sha512-zlRXUzNsnSWm1ww6+KwqtKQ4rd33Mo3yH6m+LnwPVR5kfpIMcpzFOwNWREDhJtf36x5qPr+Igv+OSRklv31SbQ==
+"@coinbase/wallet-sdk@4.0.0-beta.14":
+  version "4.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/@coinbase/wallet-sdk/-/wallet-sdk-4.0.0-beta.14.tgz#54b4fe74e9a855a48df8fb61ab37544c388ad011"
+  integrity sha512-3NtiupIMDjJEi1tP79o4zfsrxqSxuWw89+JKQDJ0UBSBcH08TFEWq4bNiyfgO/CTOOPvbTS8DABydnSlneDX/A==
   dependencies:
     buffer "^6.0.3"
     clsx "^1.2.1"

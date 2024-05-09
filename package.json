@@ -1,6 +1,6 @@
 {
   "name": "wallet-connector-extention",
-  "version": "0.1.42",
+  "version": "0.1.43",
   "private": false,
   "main": "dist/index.js",
   "files": [
@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@coinbase/wallet-sdk": "4.0.0-rc.3",
+    "@coinbase/wallet-sdk": "4.0.0-beta.14",
     "@metamask/inpage-provider": "8.0.3",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
