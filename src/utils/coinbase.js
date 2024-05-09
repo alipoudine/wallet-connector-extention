@@ -8,7 +8,7 @@ const setupCoinbaseWallet = () => {
   });
 
   const provider = walletLink.makeWeb3Provider({
-    options: 'smartWalletOnly',
+    options: 'all',
   });
 
   // keysUrl: "https://mainnet.infura.io/v3/a7369cfe951548d7a4fe0938ff4f24a9",
