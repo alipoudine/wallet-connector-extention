@@ -1,16 +1,52 @@
+import { MetaMaskInpageProvider } from '@metamask/inpage-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
+import PortStream from 'extension-port-stream'
+import { detect } from 'detect-browser'
 import { getNormalizeAddress } from './utils';
 import Web3 from 'web3';
-import createMetaMaskProvider from 'metamask-extension-provider'
+import { Buffer } from 'buffer';
 
+const browser = detect()
+window.Buffer = Buffer;
 
-// import { Buffer } from 'buffer';
-// window.Buffer = Buffer;
-// if (typeof process === 'undefined') {
-//     const process = require('process');
-//     window.process = process;
-// }
+if (typeof process === 'undefined') {
+    const process = require('process');
+    window.process = process;
+}
 
+const config = {
+    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
+    "FIREFOX_ID": "webextension@metamask.io"
+}
+
+const createMetamaskProvider = () => {
+    try {
+        if (window.ethereum) {
+            console.log('found window.ethereum>>');
+            return window.ethereum;
+        } else {
+            console.log("not found window.ethereum>>")
+            let currentMetaMaskId = getMetaMaskId()
+            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
+            const pluginStream = new PortStream(metamaskPort)
+            return new MetaMaskInpageProvider(pluginStream)
+        }
+    } catch (error) {
+        console.dir(`Metamask connect error `, error)
+        throw error
+    }
+}
+
+const getMetaMaskId = () => {
+    switch (browser && browser.name) {
+        case 'chrome':
+            return config.CHROME_ID
+        case 'firefox':
+            return config.FIREFOX_ID
+        default:
+            return config.CHROME_ID
+    }
+}
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     const walletLink = new CoinbaseWalletSDK({
@@ -18,13 +54,14 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         appLogoUrl,
         appChainIds
     });
-
+    
     const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
 
-    const metamaskProvider = createMetaMaskProvider()
+    const metamaskProvider = createMetamaskProvider()
+
     // coinbase functionalities
 
-    const getCoinbaseProvider = async () => {
+    const getCoinbaseProvider = () => {
         return coinbaseProvider
     }
 
@@ -53,10 +90,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     const coinbaseChainId = async () => {
         try {
-
-            const web3 = new Web3(coinbaseProvider);
-            const chainId = await web3.eth.getChainId();
-            // const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
+            const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
             if (!chainId) {
                 throw new Error("chainId not detected");
             }
@@ -67,19 +101,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
-    const coinbaseNetworkChange = async (chainId,) => {
-        try {
-            // Request the wallet to switch or add the network
-            await ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                    chainId: chainId,
-                }],
-            });
-        } catch (error) {
-            console.error('Failed to change network', error);
-        }
-    }
     const coinbasePersonalSign = async (message, account) => {
         try {
             const checkSumAddress = Web3.utils.toChecksumAddress(account)
@@ -142,7 +163,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     // Metamask functionalities
 
-    const getMetamaskProvider = async () => {
+    const getMetamaskProvider = () => {
         return metamaskProvider
     }
 
@@ -162,10 +183,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     const metamaskChainId = async () => {
         try {
-            const web3 = new Web3(metamaskProvider);
-            const chainId = await web3.eth.getChainId();
-
-            // const chainId = await metamaskProvider.request({ method: 'eth_chainId' })
+            const chainId = await metamaskProvider.request({ method: 'eth_chainId' })
             if (!chainId) {
                 throw new Error("chainId not detected");
             }
@@ -192,10 +210,9 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     };
 
-    const metamaskDisconnect = async () => {
+    const metamaskDisconnect = () => {
         try {
-            console.log("disconnect wallet runs")
-            await metamaskProvider.disconnect()
+            console.log("disconnectWallet runs")
         } catch (error) {
             console.log(error);
             return error
@@ -279,7 +296,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         coinbaseConnect,
         coinbaseDisconnect,
         coinbaseChainId,
-        coinbaseNetworkChange,
         coinbasePersonalSign,
         coinbasePayment,
         coinbaseContractCall,
