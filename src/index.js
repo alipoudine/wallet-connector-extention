@@ -1,4 +1,5 @@
 import { MetaMaskInpageProvider } from '@metamask/inpage-provider'
+import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import PortStream from 'extension-port-stream'
 import { detect } from 'detect-browser'
 import { getNormalizeAddress } from './utils';
@@ -17,6 +18,11 @@ const config = {
     "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
     "FIREFOX_ID": "webextension@metamask.io"
 }
+
+// complete the functionalities
+// pass provider for listeners on connect network and ... in extension
+// handle chainId 
+// 
 
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
@@ -37,11 +43,10 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
                 throw new Error("wallet address not selected");
             }
             const account = getNormalizeAddress(accounts);
-            console.log("User's address : ", account);
             return { account };
         } catch (error) {
-            console.log("error while connect", error);
-            return { error }
+            console.log("error while connecting to coinbase : ", error);
+            return error
         }
     };
 
@@ -49,8 +54,8 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         try {
             walletLink.disconnect()
         } catch (error) {
-            console.log("error while disconnecting wallet", error);
-            return { error }
+            console.log("error while disconnecting wallet : ", error);
+            return error
         }
     }
 
@@ -66,8 +71,8 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
             }
             return { chainId };
         } catch (error) {
-            console.log("error while connect", e);
-            return { error }
+            console.log("error getting chainId : ", error);
+            return error
         }
     }
 
@@ -80,10 +85,10 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
                 method: 'personal_sign',
                 params: [messageHash, checkSumAddress]
             })
-            console.log('Signature:', signature);
             return signature
         } catch (error) {
-            console.log("error while connect", error);
+            console.log("error coinbase personal signing : ", error);
+            return error
         }
     }
 
@@ -102,30 +107,46 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
                     }
                 ]
             })
-            console.log('Hash:', hash);
-            return signature
+            return hash
         } catch (error) {
-            console.log("error while connect", error);
+            return error
         }
 
     }
 
     const coinbaseContractCall = async () => {
+        try {
 
+        } catch (error) {
+            console.log("error coinbase contract call : ", error);
+            return error
+        }
     }
 
     const metamaskConnect = async () => {
-        console.log("connectWallet runs....")
         try {
-            const [accounts, chainId] = await getMetamaskAccounts(metamaskProvider);
-            if (accounts && accounts.length > 0 && chainId) {
-                const account = getNormalizeAddress(accounts);
-                storage.set('connected', { connected: true, wallet: 'metamask' });
-                // metamaskSubscribeToEvents(metamaskProvider)
-                return { account, chainId }
+            const accounts = metamaskProvider.request({ method: 'eth_requestAccounts' })
+            if (!accounts || accounts.length <= 0) {
+                throw new Error("wallet address not selected");
             }
-        } catch (e) {
-            console.log("error while connect", e);
+            const account = getNormalizeAddress(accounts);
+            return { account }
+        } catch (error) {
+            console.log("error while connecting to metamask", error);
+            return error
+        }
+    }
+
+    const metamaskChainId = async () => {
+        try {
+            const chainId = await metamaskProvider.request({ method: 'eth_chainId' })
+            if (!chainId) {
+                throw new Error("chainId not detected");
+            }
+            return { chainId };
+        } catch (error) {
+            console.log("error getting chainId : ", error);
+            return error
         }
     }
 
@@ -138,19 +159,19 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
                 method: 'personal_sign',
                 params: [messageHash, checkSumAddress]
             });
-            console.log(`Signature: ${signature}`);
             return signature;
         } catch (error) {
             console.error("Failed to sign message with MetaMask:", error);
-            throw error;
+            return error
         }
     };
 
     const metamaskDisconnect = () => {
         try {
             console.log("disconnectWallet runs")
-        } catch (e) {
-            console.log(e);
+        } catch (error) {
+            console.log(error);
+            return error
         }
     }
 
@@ -169,27 +190,19 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
                     }
                 ]
             })
-            console.log('Hash:', hash);
-            return signature
+            return hash
         } catch (error) {
             console.log("error while connect", error);
+            return error
         }
     }
 
     const metamaskContractCall = () => {
+        try {
 
-    }
-
-    const getMetamaskAccounts = async () => {
-        console.log("metamask provider =====> ", metamaskProvider)
-        if (metamaskProvider) {
-            const [accounts, chainId] = await Promise.all([
-                metamaskProvider.request({
-                    method: 'eth_requestAccounts',
-                }),
-                metamaskProvider.request({ method: 'eth_chainId' }),
-            ]);
-            return [accounts, chainId];
+        } catch (error) {
+            console.log("error metamask contract call : ", error);
+            return error
         }
     }
 
@@ -211,12 +224,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
-    const connectEagerly = async () => {
-        const metamask = await storage.get('connected');
-        if (metamask?.connected) {
-            await this.MetamaskConnect();
-        }
-    }
 
     const metamaskHandleChainChanged = (chainId) => {
         metamaskChainId = chainId;
@@ -229,28 +236,22 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     }
 
     const getMetamaskProvider = async () => {
-        if (window.ethereum) {
-            console.log('found window.ethereum>>');
-            return window.ethereum;
-        } else {
-            console.log("not found window.ethereum>>")
-            const provider = createMetaMaskProvider();
-            return provider;
-        }
-    }
-
-    const createMetaMaskProvider = () => {
-        let provider
         try {
-            let currentMetaMaskId = getMetaMaskId()
-            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
-            const pluginStream = new PortStream(metamaskPort)
-            provider = new MetaMaskInpageProvider(pluginStream)
-        } catch (e) {
-            console.dir(`Metamask connect error `, e)
-            throw e
+            if (window.ethereum) {
+                console.log('found window.ethereum>>');
+                return window.ethereum;
+            } else {
+                console.log("not found window.ethereum>>")
+
+                let currentMetaMaskId = getMetaMaskId()
+                const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
+                const pluginStream = new PortStream(metamaskPort)
+                return new MetaMaskInpageProvider(pluginStream)
+            }
+        } catch (error) {
+            console.dir(`Metamask connect error `, error)
+            throw error
         }
-        return provider
     }
 
     const getMetaMaskId = () => {
@@ -273,8 +274,9 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         coinbaseContractCall,
         //
         metamaskConnect,
-        metamaskPersonalSign,
         metamaskDisconnect,
+        metamaskChainId,
+        metamaskPersonalSign,
         metamaskPayment,
         metamaskContractCall
     };
