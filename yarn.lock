@@ -1333,27 +1333,23 @@
   resolved "https://registry.npmjs.org/@leichtgewicht/ip-codec/-/ip-codec-2.0.5.tgz"
   integrity sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==
 
-"@metamask/inpage-provider@^8.0.3":
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/@metamask/inpage-provider/-/inpage-provider-8.1.0.tgz#409bb4483f3f2bfade668f4e30d36d1490975c33"
-  integrity sha512-RB2tUfj3DITNqjsFB0UvBGQYtsUHMGccsbA+2BkeE6h/UNTmc3onwmLY6z2yrEPZywpHJvj1FMiORdvtQPhOVg==
+"@metamask/inpage-provider@8.0.3":
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/@metamask/inpage-provider/-/inpage-provider-8.0.3.tgz#65f636233a13a00e1f199a421bdfa8099ed28ea4"
+  integrity sha512-pj9tGNoS1edohuRJzxOuILRqRrQTdgu5mJwMwa9wuOZIMQLFZtr3g2T6vayPBwoNkE1FzLhs/osUqaVQDRfDvQ==
   dependencies:
     "@metamask/object-multiplex" "^1.1.0"
     "@metamask/safe-event-emitter" "^2.0.0"
-    "@types/chrome" "^0.0.136"
-    detect-browser "^5.2.0"
     eth-rpc-errors "^4.0.2"
-    extension-port-stream "^2.0.1"
     fast-deep-equal "^2.0.1"
     is-stream "^2.0.0"
     json-rpc-engine "^6.1.0"
     json-rpc-middleware-stream "^3.0.0"
     pump "^3.0.0"
-    webextension-polyfill-ts "^0.25.0"
 
 "@metamask/object-multiplex@^1.1.0":
   version "1.3.0"
-  resolved "https://registry.npmjs.org/@metamask/object-multiplex/-/object-multiplex-1.3.0.tgz"
+  resolved "https://registry.yarnpkg.com/@metamask/object-multiplex/-/object-multiplex-1.3.0.tgz#459de4862aa5a5a025dabceadda0ffd553ca4b25"
   integrity sha512-czcQeVYdSNtabd+NcYQnrM69MciiJyd1qvKH8WM2Id3C0ZiUUX5Xa/MK+/VUk633DBhVOwdNzAKIQ33lGyA+eQ==
   dependencies:
     end-of-stream "^1.4.4"
@@ -1362,7 +1358,7 @@
 
 "@metamask/safe-event-emitter@^2.0.0":
   version "2.0.0"
-  resolved "https://registry.npmjs.org/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
   integrity sha512-/kSXhY692qiV1MXu6EeOZvg5nECLclxNXcKCxJ3cXQgYuRymRHpdx/t7JXfsK+JLjwA1e1c1/SBrlQYpusC29Q==
 
 "@noble/hashes@^1.4.0":
@@ -1438,14 +1434,6 @@
     "@types/node" "*"
     "@types/responselike" "^1.0.0"
 
-"@types/chrome@^0.0.136":
-  version "0.0.136"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.136.tgz#7c011b9f997b0156f25a140188a0c5689d3f368f"
-  integrity sha512-XDEiRhLkMd+SB7Iw3ZUIj/fov3wLd4HyTdLltVszkgl1dBfc3Rb7oPMVZ2Mz2TLqnF7Ow+StbR8E7r9lqpb4DA==
-  dependencies:
-    "@types/filesystem" "*"
-    "@types/har-format" "*"
-
 "@types/connect-history-api-fallback@^1.5.4":
   version "1.5.4"
   resolved "https://registry.npmjs.org/@types/connect-history-api-fallback/-/connect-history-api-fallback-1.5.4.tgz"
@@ -1501,23 +1489,6 @@
     "@types/express-serve-static-core" "^4.17.33"
     "@types/qs" "*"
     "@types/serve-static" "*"
-
-"@types/filesystem@*":
-  version "0.0.36"
-  resolved "https://registry.yarnpkg.com/@types/filesystem/-/filesystem-0.0.36.tgz#7227c2d76bfed1b21819db310816c7821d303857"
-  integrity sha512-vPDXOZuannb9FZdxgHnqSwAG/jvdGM8Wq+6N4D/d80z+D4HWH+bItqsZaVRQykAn6WEVeEkLm2oQigyHtgb0RA==
-  dependencies:
-    "@types/filewriter" "*"
-
-"@types/filewriter@*":
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/@types/filewriter/-/filewriter-0.0.33.tgz#d9d611db9d9cd99ae4e458de420eeb64ad604ea8"
-  integrity sha512-xFU8ZXTw4gd358lb2jw25nxY9QAgqn2+bKKjKOYfNCzN4DKCFetK7sPtrlpg66Ywe3vWY9FNxprZawAh9wfJ3g==
-
-"@types/har-format@*":
-  version "1.2.15"
-  resolved "https://registry.yarnpkg.com/@types/har-format/-/har-format-1.2.15.tgz#f352493638c2f89d706438a19a9eb300b493b506"
-  integrity sha512-RpQH4rXLuvTXKR0zqHq3go0RVXYv/YVqv4TnPH95VbwUxZdQlK1EtcMvQvMpDngHbt13Csh9Z4qT9AbkiQH5BA==
 
 "@types/http-cache-semantics@*":
   version "4.0.4"
@@ -3391,15 +3362,10 @@ destroy@~1.0.4:
   resolved "https://registry.npmjs.org/destroy/-/destroy-1.0.4.tgz"
   integrity sha512-3NdhDuEXnfun/z7x9GOElY49LoqVHoGScmOKwmxhsS8N5Y+Z8KyPPDnaSzqWgYt/ji4mqwfTS34Htrk0zPIXVg==
 
-detect-browser@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-3.0.1.tgz#39beead014347a8a2be1f3c4cb30a0aef2127c44"
-  integrity sha512-L6b76EfUxnoxGHM5Vz7nrshQPIbOHtitDWpGufrp5srQdJrEYi1xpUVZeFbfssWAJvUWo/iDIVlz8hOP4Z8OCw==
-
-detect-browser@^5.2.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-5.3.0.tgz#9705ef2bddf46072d0f7265a1fe300e36fe7ceca"
-  integrity sha512-53rsFbGdwMwlF7qvCt0ypLM5V5/Mbl0szB7GPN8y9NCcbknYOeVVXdrXEq+90IwAfrrzt6Hd+u2E2ntakICU8w==
+detect-browser@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-3.0.0.tgz#3fc232002c56d427410a9e1ac3b3e8c3a80bb848"
+  integrity sha512-ykq76dexT6GiaHuaQxJ7Cd0B/xe/8VDLCpaWw4qCWKhWV/zjdY7r7BByBGNcgTlruOEyzFf0q1AAX7/yWeep8g==
 
 detect-file@^1.0.0:
   version "1.0.0"
@@ -3734,7 +3700,7 @@ eth-lib@^0.1.26:
 
 eth-rpc-errors@^4.0.2:
   version "4.0.3"
-  resolved "https://registry.npmjs.org/eth-rpc-errors/-/eth-rpc-errors-4.0.3.tgz"
+  resolved "https://registry.yarnpkg.com/eth-rpc-errors/-/eth-rpc-errors-4.0.3.tgz#6ddb6190a4bf360afda82790bb7d9d5e724f423a"
   integrity sha512-Z3ymjopaoft7JDoxZcEb3pwdGh7yiYMhOwm2doUt6ASXlMavpNlK6Cre0+IMl2VSGyEU9rkiperQhp5iRxn5Pg==
   dependencies:
     fast-safe-stringify "^2.0.6"
@@ -3921,12 +3887,10 @@ extend@^3.0.0, extend@~3.0.2:
   resolved "https://registry.npmjs.org/extend/-/extend-3.0.2.tgz"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
 
-extension-port-stream@^2.0.0, extension-port-stream@^2.0.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/extension-port-stream/-/extension-port-stream-2.1.1.tgz#ec11f2a5ed95655d8c40805d7cb0c39939ee9ef4"
-  integrity sha512-qknp5o5rj2J9CRKfVB8KJr+uXQlrojNZzdESUPhKYLXf97TPcGf6qWWKmpsNNtUyOdzFhab1ON0jzouNxHHvow==
-  dependencies:
-    webextension-polyfill ">=0.10.0 <1.0"
+extension-port-stream@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/extension-port-stream/-/extension-port-stream-2.0.0.tgz#c52da241eef4643171b7c6d696baa4a3453c5a9a"
+  integrity sha512-7ju8jisPXY8w8UiUczF61hRN6bpx/YTZYU9J901GnEqu7vQnweMAwS30k+SgXCcY9S38Zno+fhuu1iaxd+0swg==
 
 extglob@^2.0.4:
   version "2.0.4"
@@ -3964,7 +3928,7 @@ fancy-log@^1.3.2:
 
 fast-deep-equal@^2.0.1:
   version "2.0.1"
-  resolved "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-2.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-2.0.1.tgz#7b05218ddf9667bf7f370bf7fdb2cb15fdd0aa49"
   integrity sha512-bCK/2Z4zLidyB4ReuIsvALH6w31YfAQDmXMqMx6FyfHqvBxtjC0eRumeSu4Bs3XtXwpyIywtSTrVT99BxY1f9w==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
@@ -3984,7 +3948,7 @@ fast-levenshtein@^1.0.0:
 
 fast-safe-stringify@^2.0.6, fast-safe-stringify@^2.0.7:
   version "2.1.1"
-  resolved "https://registry.npmjs.org/fast-safe-stringify/-/fast-safe-stringify-2.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/fast-safe-stringify/-/fast-safe-stringify-2.1.1.tgz#c406a83b6e70d9e35ce3b30a81141df30aeba884"
   integrity sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==
 
 fastest-levenshtein@^1.0.12:
@@ -5233,7 +5197,7 @@ json-parse-even-better-errors@^2.3.1:
 
 json-rpc-engine@^6.1.0:
   version "6.1.0"
-  resolved "https://registry.npmjs.org/json-rpc-engine/-/json-rpc-engine-6.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/json-rpc-engine/-/json-rpc-engine-6.1.0.tgz#bf5ff7d029e1c1bf20cb6c0e9f348dcd8be5a393"
   integrity sha512-NEdLrtrq1jUZyfjkr9OCz9EzCNhnRyWtt1PAnvnhwy6e8XETS0Dtc+ZNCO2gvuAoKsIn2+vCSowXTYE4CkgnAQ==
   dependencies:
     "@metamask/safe-event-emitter" "^2.0.0"
@@ -5241,7 +5205,7 @@ json-rpc-engine@^6.1.0:
 
 json-rpc-middleware-stream@^3.0.0:
   version "3.0.0"
-  resolved "https://registry.npmjs.org/json-rpc-middleware-stream/-/json-rpc-middleware-stream-3.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/json-rpc-middleware-stream/-/json-rpc-middleware-stream-3.0.0.tgz#8540331d884f36b9e0ad31054cc68ac6b5a89b52"
   integrity sha512-JmZmlehE0xF3swwORpLHny/GvW3MZxCsb2uFNBrn8TOqMqivzCfz232NSDLLOtIQlrPlgyEjiYpyzyOPFOzClw==
   dependencies:
     "@metamask/safe-event-emitter" "^2.0.0"
@@ -5572,15 +5536,6 @@ merge-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/merge-stream/-/merge-stream-2.0.0.tgz"
   integrity sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==
-
-metamask-extension-provider@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/metamask-extension-provider/-/metamask-extension-provider-3.0.0.tgz#9713283ed95e8b546af211a913750f0a9eedc778"
-  integrity sha512-IQyrtzhFTW9Rd/nZTAmhFyrnlFqUK+0Tqht+G+azbf93EABBmxY3FD1aFDoR5rKToqa3WMrg0Kd5tBDZMgVaTg==
-  dependencies:
-    "@metamask/inpage-provider" "^8.0.3"
-    detect-browser "^3.0.0"
-    extension-port-stream "^2.0.0"
 
 methods@~1.1.2:
   version "1.1.2"
@@ -8392,26 +8347,6 @@ web3@1.7.3:
     web3-net "1.7.3"
     web3-shh "1.7.3"
     web3-utils "1.7.3"
-
-webextension-polyfill-ts@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/webextension-polyfill-ts/-/webextension-polyfill-ts-0.25.0.tgz#fff041626365dbd0e29c40b197e989a55ec221ca"
-  integrity sha512-ikQhwwHYkpBu00pFaUzIKY26I6L87DeRI+Q6jBT1daZUNuu8dSrg5U9l/ZbqdaQ1M/TTSPKeAa3kolP5liuedw==
-  dependencies:
-    webextension-polyfill "^0.7.0"
-
-"webextension-polyfill@>=0.10.0 <1.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.11.0.tgz#1640c0d27192424fd5b420237acbe453f88c8246"
-  integrity sha512-YUBSKQA0iCx2YtM75VFgvvcx1hLKaGGiph6a6UaUdSgk32VT9SzrcDAKBjeGHXoAZTnNBqS5skA4VfoKMXhEBA==
-  dependencies:
-    webpack "^5.91.0"
-    webpack-cli "^5.1.4"
-
-webextension-polyfill@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.7.0.tgz#0df1120ff0266056319ce1a622b09ad8d4a56505"
-  integrity sha512-su48BkMLxqzTTvPSE1eWxKToPS2Tv5DLGxKexLEVpwFd6Po6N8hhSLIvG6acPAg7qERoEaDL+Y5HQJeJeml5Aw==
 
 webpack-cli@^5.1.4:
   version "5.1.4"
