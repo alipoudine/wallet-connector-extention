@@ -4,12 +4,12 @@ import Web3 from 'web3';
 import createMetaMaskProvider from 'metamask-extension-provider'
 
 
-import { Buffer } from 'buffer';
-window.Buffer = Buffer;
-if (typeof process === 'undefined') {
-    const process = require('process');
-    window.process = process;
-}
+// import { Buffer } from 'buffer';
+// window.Buffer = Buffer;
+// if (typeof process === 'undefined') {
+//     const process = require('process');
+//     window.process = process;
+// }
 
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
