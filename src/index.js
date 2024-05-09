@@ -1,12 +1,19 @@
-import { MetaMaskInpageProvider } from '@metamask/inpage-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-import PortStream from 'extension-port-stream'
-import { detect } from 'detect-browser'
+
+
 import { getNormalizeAddress } from './utils';
 import Web3 from 'web3';
 import { Buffer } from 'buffer';
 
+const { MetaMaskInpageProvider } = require('@metamask/inpage-provider')
+const PortStream = require('extension-port-stream')
+const { detect } = require('detect-browser')
 const browser = detect()
+const config = {
+    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
+    "FIREFOX_ID": "webextension@metamask.io"
+}
+
 window.Buffer = Buffer;
 
 if (typeof process === 'undefined') {
@@ -14,10 +21,6 @@ if (typeof process === 'undefined') {
     window.process = process;
 }
 
-const config = {
-    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
-    "FIREFOX_ID": "webextension@metamask.io"
-}
 
 // complete the functionalities
 // pass provider for listeners on connect network and ... in extension
@@ -53,14 +56,14 @@ const getMetaMaskId = () => {
     }
 }
 
-export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
+export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     const walletLink = new CoinbaseWalletSDK({
         appName,
         appLogoUrl,
         appChainIds
     });
-
+    
     const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
 
     const metamaskProvider = createMetamaskProvider()
