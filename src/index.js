@@ -24,7 +24,7 @@ const config = {
 // handle chainId 
 // 
 
-const getMetamaskProvider = () => {
+const createMetamaskProvider = () => {
     try {
         if (window.ethereum) {
             console.log('found window.ethereum>>');
@@ -42,22 +42,26 @@ const getMetamaskProvider = () => {
     }
 }
 
-const walletLink = new CoinbaseWalletSDK({
-    appName,
-    appLogoUrl,
-    appChainIds
-});
+const createCoinbaseProvider = (appName, appLogoUrl, appChainIds) => {
+    const walletLink = new CoinbaseWalletSDK({
+        appName,
+        appLogoUrl,
+        appChainIds
+    });
 
-const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
-
-const metamaskProvider = getMetamaskProvider()
+    return walletLink.makeWeb3Provider({ options: 'all' });
+}
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
+    const coinbaseProvider = createCoinbaseProvider(appName, appLogoUrl, appChainIds)
+
+    const metamaskProvider = createMetamaskProvider()
+
     // coinbase functionalities
 
-    const getCoinbaseProvider = async ()=> {
-        
+    const getCoinbaseProvider = async () => {
+
     }
 
     const coinbaseConnect = async () => {
@@ -146,7 +150,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
     // Metamask functionalities
 
-    const getMetamaskProvider = async ()=> {
+    const getMetamaskProvider = async () => {
 
     }
 
