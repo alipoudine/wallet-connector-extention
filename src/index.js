@@ -2,8 +2,8 @@ import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import Web3 from 'web3';
 import { Buffer } from 'buffer';
 import { getNormalizeAddress } from './utils';
-// import { createMetaMaskProvider } from 'metamask-extension-provider';
-import { createMetaMaskProvider } from './utils/metamask';
+import { createMetaMaskProvider } from 'metamask-extension-provider';
+// import { createMetaMaskProvider } from './utils/metamask';
 
 window.Buffer = Buffer;
 
