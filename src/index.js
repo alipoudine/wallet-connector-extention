@@ -160,6 +160,25 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
+    // , chainName, rpcUrls, blockExplorerUrls
+    const coinbaseSwitchNetwork = async (chainId) => {
+        try {
+            await coinbaseProvider.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                    {
+                        chainId: Web3.utils.toHex(chainId),
+                        chainName,
+                        rpcUrls,
+                        blockExplorerUrls
+                    }
+                ]
+            });
+        } catch (error) {
+            console.log("error switching network on coinbase : ", error);
+            return error;
+        }
+    }
 
     // Metamask functionalities
 
@@ -263,33 +282,23 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         }
     }
 
-    const metamaskSubscribeToEvents = async () => {
-        if (metamaskProvider) {
-            // metamaskProvider.on(EthereumEvents.CHAIN_CHANGED, handleChainChanged);
-            // metamaskProvider.on(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged);
-            // metamaskProvider.on(EthereumEvents.CONNECT, handleConnect);
-            // metamaskProvider.on(EthereumEvents.DISCONNECT, handleDisconnect);
+    // , chainName, rpcUrls, blockExplorerUrls
+    const metamaskSwitchNetwork = async (chainId) => {
+        try {
+            await metamaskProvider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: Web3.utils.toHex(chainId) }],
+            });
+            console.log('Switched to chain:', chainId);
+        } catch (switchError) {
+            console.error('Failed to switch chain:', switchError);
+            // Handle specific errors if needed
+            if (switchError.code === 4902) {
+                // Chain not added to the wallet
+                console.error('Chain not found, you may need to add it manually.');
+            }
         }
-    }
-
-    const metamaskUnsubscribeToEvents = async () => {
-        if (metamaskProvider) {
-            // metamaskProvider.removeListener(EthereumEvents.CHAIN_CHANGED, handleChainChanged);
-            // metamaskProvider.removeListener(EthereumEvents.ACCOUNTS_CHANGED, handleAccountsChanged);
-            // metamaskProvider.removeListener(EthereumEvents.CONNECT, handleConnect);
-            // metamaskProvider.removeListener(EthereumEvents.DISCONNECT, handleDisconnect);
-        }
-    }
-
-    const metamaskHandleChainChanged = (chainId) => {
-        metamaskChainId = chainId;
-    }
-
-    const metamaskHandleAccountsChanged = (accounts) => {
-        if (accounts.length > 0) {
-            console.log("[account changes]: ", getNormalizeAddress(accounts))
-        }
-    }
+    };
 
     return {
         getCoinbaseProvider,
@@ -299,6 +308,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         coinbasePersonalSign,
         coinbasePayment,
         coinbaseContractCall,
+        coinbaseSwitchNetwork,
 
         getMetamaskProvider,
         metamaskConnect,
@@ -306,6 +316,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
         metamaskChainId,
         metamaskPersonalSign,
         metamaskPayment,
-        metamaskContractCall
+        metamaskContractCall,
+        metamaskSwitchNetwork
     };
 }
