@@ -178,7 +178,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
   const metamaskConnect = async () => {
     try {
       if (metamaskProvider && metamaskProvider.selectedAddress) {
-        return metamaskProvider.selectedAddress;
+        return {account: metamaskProvider.selectedAddress};
       }
       const accounts = await metamaskProvider.request({
         method: "eth_requestAccounts",
