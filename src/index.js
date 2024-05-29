@@ -1,322 +1,315 @@
-import { MetaMaskInpageProvider } from '@metamask/inpage-provider'
-import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-import PortStream from 'extension-port-stream'
-import { detect } from 'detect-browser'
-import { getNormalizeAddress } from './utils';
-import Web3 from 'web3';
-import { Buffer } from 'buffer';
+import { MetaMaskInpageProvider } from "@metamask/inpage-provider";
+import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
+import PortStream from "extension-port-stream";
+import { detect } from "detect-browser";
+import { getNormalizeAddress } from "./utils";
+import Web3 from "web3";
+import { Buffer } from "buffer";
 
-const browser = detect()
+const browser = detect();
 window.Buffer = Buffer;
 
-if (typeof process === 'undefined') {
-    const process = require('process');
-    window.process = process;
+if (typeof process === "undefined") {
+  const process = require("process");
+  window.process = process;
 }
 
 const config = {
-    "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
-    "FIREFOX_ID": "webextension@metamask.io"
-}
+  CHROME_ID: "nkbihfbeogaeaoehlefnkodbefgpgknn",
+  FIREFOX_ID: "webextension@metamask.io",
+};
 
 const createMetamaskProvider = () => {
-    try {
-        if (window.ethereum) {
-            console.log('found window.ethereum>>');
-            return window.ethereum;
-        } else {
-            console.log("not found window.ethereum>>")
-            let currentMetaMaskId = getMetaMaskId()
-            const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
-            const pluginStream = new PortStream(metamaskPort)
-            return new MetaMaskInpageProvider(pluginStream)
-        }
-    } catch (error) {
-        console.dir(`Metamask connect error `, error)
-        throw error
+  try {
+    if (window.ethereum) {
+      return window.ethereum;
+    } else {
+      let currentMetaMaskId = getMetaMaskId();
+      const metamaskPort = chrome.runtime.connect(currentMetaMaskId);
+      const pluginStream = new PortStream(metamaskPort);
+      return new MetaMaskInpageProvider(pluginStream);
     }
-}
+  } catch (error) {
+    console.dir(`Metamask connect error `, error);
+    throw error;
+  }
+};
 
 const getMetaMaskId = () => {
-    switch (browser && browser.name) {
-        case 'chrome':
-            return config.CHROME_ID
-        case 'firefox':
-            return config.FIREFOX_ID
-        default:
-            return config.CHROME_ID
-    }
-}
+  switch (browser && browser.name) {
+    case "chrome":
+      return config.CHROME_ID;
+    case "firefox":
+      return config.FIREFOX_ID;
+    default:
+      return config.CHROME_ID;
+  }
+};
 
 export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
-    const walletLink = new CoinbaseWalletSDK({
-        appName,
-        appLogoUrl,
-        appChainIds
-    });
-    
-    const coinbaseProvider = walletLink.makeWeb3Provider({ options: 'all' });
+  const walletLink = new CoinbaseWalletSDK({
+    appName,
+    appLogoUrl,
+    appChainIds,
+  });
 
-    const metamaskProvider = createMetamaskProvider()
+  const coinbaseProvider = walletLink.makeWeb3Provider({ options: "all" });
+  const metamaskProvider = createMetamaskProvider();
 
-    // coinbase functionalities
+  const getCoinbaseProvider = () => {
+    return coinbaseProvider;
+  };
 
-    const getCoinbaseProvider = () => {
-        return coinbaseProvider
+  const isCoinBaseConnected = ()=> {
+
+  }
+
+  const coinbaseConnect = async () => {
+    try {
+      const accounts = await coinbaseProvider.request({
+        method: "eth_requestAccounts",
+      });
+      if (!accounts || accounts.length <= 0) {
+        throw new Error("wallet address not selected");
+      }
+      const account = getNormalizeAddress(accounts);
+      return { account };
+    } catch (error) {
+      return error;
     }
+  };
 
-    const coinbaseConnect = async () => {
-        try {
-            const accounts = await coinbaseProvider.request({ method: 'eth_requestAccounts' });
-            if (!accounts || accounts.length <= 0) {
-                throw new Error("wallet address not selected");
-            }
-            const account = getNormalizeAddress(accounts);
-            return { account };
-        } catch (error) {
-            console.log("error while connecting to coinbase : ", error);
-            return error
-        }
-    };
-
-    const coinbaseDisconnect = async () => {
-        try {
-            walletLink.disconnect()
-        } catch (error) {
-            console.log("error while disconnecting wallet : ", error);
-            return error
-        }
+  const coinbaseDisconnect = async () => {
+    try {
+      walletLink.disconnect();
+    } catch (error) {
+      return error;
     }
+  };
 
-    const coinbaseChainId = async () => {
-        try {
-            const chainId = await coinbaseProvider.request({ method: 'eth_chainId' })
-            if (!chainId) {
-                throw new Error("chainId not detected");
-            }
-            return { chainId };
-        } catch (error) {
-            console.log("error getting chainId : ", error);
-            return error
-        }
+  const coinbaseChainId = async () => {
+    try {
+      const chainId = await coinbaseProvider.request({ method: "eth_chainId" });
+      if (!chainId) {
+        throw new Error("chainId not detected");
+      }
+      return { chainId };
+    } catch (error) {
+      return error;
     }
+  };
 
-    const coinbasePersonalSign = async (message, account) => {
-        try {
-            const checkSumAddress = Web3.utils.toChecksumAddress(account)
-            const messageHash = Web3.utils.utf8ToHex(message)
-            const signature = await coinbaseProvider.request({
-                method: 'personal_sign',
-                params: [messageHash, checkSumAddress]
-            })
-            return signature
-        } catch (error) {
-            console.log("error coinbase personal signing : ", error);
-            return error
-        }
+  const coinbasePersonalSign = async (message, account) => {
+    try {
+      const checkSumAddress = Web3.utils.toChecksumAddress(account);
+      const messageHash = Web3.utils.utf8ToHex(message);
+      const signature = await coinbaseProvider.request({
+        method: "personal_sign",
+        params: [messageHash, checkSumAddress],
+      });
+      return signature;
+    } catch (error) {
+      return error;
     }
+  };
 
-    const coinbasePayment = async (from, to, value) => {
-        try {
-            const hash = await coinbaseProvider.request({
-                method: 'eth_sendTransaction',
-                params: [
-                    {
-                        from,
-                        to,
-                        value,
-                        gasLimit: '0x5028',
-                        maxPriorityFeePerGas: '0x3b9aca00',
-                        maxFeePerGas: '0x2540be400',
-                    }
-                ]
-            })
-            return hash
-        } catch (error) {
-            return error
-        }
-
+  const coinbasePayment = async (from, to, value) => {
+    try {
+      const hash = await coinbaseProvider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from,
+            to,
+            value,
+            gasLimit: "0x5028",
+            maxPriorityFeePerGas: "0x3b9aca00",
+            maxFeePerGas: "0x2540be400",
+          },
+        ],
+      });
+      return hash;
+    } catch (error) {
+      return error;
     }
+  };
 
-    const coinbaseContractCall = async () => {
-        try {
-            const hash = await coinbaseProvider.request({
-                method: 'eth_sendTransaction',
-                params: [
-                    {
-                        from,
-                        to,
-                        value,
-                        gasLimit: '0x5028',
-                        maxPriorityFeePerGas: '0x3b9aca00',
-                        maxFeePerGas: '0x2540be400',
-                    }
-                ]
-            })
-            return hash
-        } catch (error) {
-            console.log("error coinbase contract call : ", error);
-            return error
-        }
+  const coinbaseContractCall = async () => {
+    try {
+      const hash = await coinbaseProvider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from,
+            to,
+            value,
+            gasLimit: "0x5028",
+            maxPriorityFeePerGas: "0x3b9aca00",
+            maxFeePerGas: "0x2540be400",
+          },
+        ],
+      });
+      return hash;
+    } catch (error) {
+      return error;
     }
+  };
 
-    // , chainName, rpcUrls, blockExplorerUrls
-    const coinbaseSwitchNetwork = async (chainId) => {
-        try {
-            await coinbaseProvider.request({
-                method: 'wallet_addEthereumChain',
-                params: [
-                    {
-                        chainId: Web3.utils.toHex(chainId),
-                        chainName,
-                        rpcUrls,
-                        blockExplorerUrls
-                    }
-                ]
-            });
-        } catch (error) {
-            console.log("error switching network on coinbase : ", error);
-            return error;
-        }
+  // , chainName, rpcUrls, blockExplorerUrls
+  const coinbaseSwitchNetwork = async (chainId) => {
+    try {
+      await coinbaseProvider.request({
+        method: "wallet_switchEthereumChain",
+        params: [
+          {
+            chainId: Web3.utils.toHex(chainId),
+          },
+        ],
+      });
+    } catch (error) {
+      // Handle specific errors if needed
+      if (switchError.code === 4902) {
+        // Chain not added to the wallet
+      }
+      return error;
     }
+  };
 
-    // Metamask functionalities
+  const getMetamaskProvider = () => {
+    return metamaskProvider;
+  };
 
-    const getMetamaskProvider = () => {
-        return metamaskProvider
+
+  const isMetamaskConnected = ()=> {
+
+  }
+
+  const metamaskConnect = async () => {
+    try {
+      const accounts = await metamaskProvider.request({
+        method: "eth_requestAccounts",
+      });
+      if (!accounts || accounts.length <= 0) {
+        throw new Error("wallet address not selected");
+      }
+      const account = getNormalizeAddress(accounts);
+      return { account };
+    } catch (error) {
+      return error;
     }
+  };
 
-    const metamaskConnect = async () => {
-        try {
-            const accounts = await metamaskProvider.request({ method: 'eth_requestAccounts' })
-            if (!accounts || accounts.length <= 0) {
-                throw new Error("wallet address not selected");
-            }
-            const account = getNormalizeAddress(accounts);
-            return { account }
-        } catch (error) {
-            console.log("error while connecting to metamask", error);
-            return error
-        }
+  const metamaskChainId = async () => {
+    try {
+      const chainId = await metamaskProvider.request({ method: "eth_chainId" });
+      if (!chainId) {
+        throw new Error("chainId not detected");
+      }
+      return { chainId };
+    } catch (error) {
+      return error;
     }
+  };
 
-    const metamaskChainId = async () => {
-        try {
-            const chainId = await metamaskProvider.request({ method: 'eth_chainId' })
-            if (!chainId) {
-                throw new Error("chainId not detected");
-            }
-            return { chainId };
-        } catch (error) {
-            console.log("error getting chainId : ", error);
-            return error
-        }
+  const metamaskPersonalSign = async (message, account) => {
+    try {
+      const checkSumAddress = Web3.utils.toChecksumAddress(account);
+      const messageHash = Web3.utils.utf8ToHex(message);
+
+      const signature = await metamaskProvider.request({
+        method: "personal_sign",
+        params: [messageHash, checkSumAddress],
+      });
+      return signature;
+    } catch (error) {
+      return error;
     }
+  };
 
-    const metamaskPersonalSign = async (message, account) => {
-        try {
-            const checkSumAddress = Web3.utils.toChecksumAddress(account)
-            const messageHash = Web3.utils.utf8ToHex(message)
-
-            const signature = await metamaskProvider.request({
-                method: 'personal_sign',
-                params: [messageHash, checkSumAddress]
-            });
-            return signature;
-        } catch (error) {
-            console.error("Failed to sign message with MetaMask:", error);
-            return error
-        }
-    };
-
-    const metamaskDisconnect = () => {
-        try {
-            console.log("disconnectWallet runs")
-        } catch (error) {
-            console.log(error);
-            return error
-        }
+  const metamaskDisconnect = () => {
+    try {
+      console.log("disconnectWallet runs");
+    } catch (error) {
+      return error;
     }
+  };
 
-    const metamaskPayment = async (from, to, value) => {
-        try {
-            const hash = await metamaskProvider.request({
-                method: 'eth_sendTransaction',
-                params: [
-                    {
-                        from,
-                        to,
-                        value,
-                        gasLimit: '0x5028',
-                        maxPriorityFeePerGas: '0x3b9aca00',
-                        maxFeePerGas: '0x2540be400',
-                    }
-                ]
-            })
-            return hash
-        } catch (error) {
-            console.log("error while connect", error);
-            return error
-        }
+  const metamaskPayment = async (from, to, value) => {
+    try {
+      const hash = await metamaskProvider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from,
+            to,
+            value,
+            gasLimit: "0x5028",
+            maxPriorityFeePerGas: "0x3b9aca00",
+            maxFeePerGas: "0x2540be400",
+          },
+        ],
+      });
+      return hash;
+    } catch (error) {
+      return error;
     }
+  };
 
-    const metamaskContractCall = async () => {
-        try {
-            const hash = await metamaskProvider.request({
-                method: 'eth_sendTransaction',
-                params: [
-                    {
-                        from,
-                        to,
-                        value,
-                        gasLimit: '0x5028',
-                        maxPriorityFeePerGas: '0x3b9aca00',
-                        maxFeePerGas: '0x2540be400',
-                    }
-                ]
-            })
-            return hash
-        } catch (error) {
-            console.log("error metamask contract call : ", error);
-            return error
-        }
+  const metamaskContractCall = async () => {
+    try {
+      const hash = await metamaskProvider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from,
+            to,
+            value,
+            gasLimit: "0x5028",
+            maxPriorityFeePerGas: "0x3b9aca00",
+            maxFeePerGas: "0x2540be400",
+          },
+        ],
+      });
+      return hash;
+    } catch (error) {
+      return error;
     }
+  };
 
-    // , chainName, rpcUrls, blockExplorerUrls
-    const metamaskSwitchNetwork = async (chainId) => {
-        try {
-            await metamaskProvider.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: Web3.utils.toHex(chainId) }],
-            });
-            console.log('Switched to chain:', chainId);
-        } catch (switchError) {
-            console.error('Failed to switch chain:', switchError);
-            // Handle specific errors if needed
-            if (switchError.code === 4902) {
-                // Chain not added to the wallet
-                console.error('Chain not found, you may need to add it manually.');
-            }
-        }
-    };
+  // , chainName, rpcUrls, blockExplorerUrls
+  const metamaskSwitchNetwork = async (chainId) => {
+    try {
+      await metamaskProvider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: Web3.utils.toHex(chainId) }],
+      });
+    } catch (error) {
+      // Handle specific errors if needed
+      if (error.code === 4902) {
+        // Chain not added to the wallet
+      }
+    }
+  };
 
-    return {
-        getCoinbaseProvider,
-        coinbaseConnect,
-        coinbaseDisconnect,
-        coinbaseChainId,
-        coinbasePersonalSign,
-        coinbasePayment,
-        coinbaseContractCall,
-        coinbaseSwitchNetwork,
+  return {
+    coinbaseProvider,
+    getCoinbaseProvider,
+    coinbaseConnect,
+    coinbaseDisconnect,
+    coinbaseChainId,
+    coinbasePersonalSign,
+    coinbasePayment,
+    coinbaseContractCall,
+    coinbaseSwitchNetwork,
 
-        getMetamaskProvider,
-        metamaskConnect,
-        metamaskDisconnect,
-        metamaskChainId,
-        metamaskPersonalSign,
-        metamaskPayment,
-        metamaskContractCall,
-        metamaskSwitchNetwork
-    };
-}
+    metamaskProvider,
+    getMetamaskProvider,
+    metamaskConnect,
+    metamaskDisconnect,
+    metamaskChainId,
+    metamaskPersonalSign,
+    metamaskPayment,
+    metamaskContractCall,
+    metamaskSwitchNetwork,
+  };
+};
