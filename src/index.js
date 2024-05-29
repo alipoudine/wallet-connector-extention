@@ -60,23 +60,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     return coinbaseProvider;
   };
 
-  const isCoinBaseConnected = async () => {
-    try {
-      if (coinbaseProvider && coinbaseProvider.accounts.length > 0) {
-        return coinbaseProvider.accounts[0];
-      } else {
-        const accounts = await coinbaseProvider.request({ method: "eth_accounts" });
-        if (accounts && accounts.length > 0) {
-          return accounts[0];
-        }
-      }
-      return null;
-    } catch (error) {
-      console.error("Error checking Coinbase connection:", error);
-      return null;
-    }
-  };
-
   const coinbaseConnect = async () => {
     try {
       const accounts = await coinbaseProvider.request({
@@ -192,25 +175,11 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     return metamaskProvider;
   };
 
-  const isMetamaskConnected = async () => {
+  const metamaskConnect = async () => {
     try {
       if (metamaskProvider && metamaskProvider.selectedAddress) {
         return metamaskProvider.selectedAddress;
-      } else {
-        const accounts = await metamaskProvider.request({ method: "eth_accounts" });
-        if (accounts && accounts.length > 0) {
-          return accounts[0];
-        }
       }
-      return null;
-    } catch (error) {
-      console.error("Error checking MetaMask connection:", error);
-      return null;
-    }
-  };
-
-  const metamaskConnect = async () => {
-    try {
       const accounts = await metamaskProvider.request({
         method: "eth_requestAccounts",
       });
@@ -318,7 +287,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
   return {
     coinbaseProvider,
-    isCoinBaseConnected,
     getCoinbaseProvider,
     coinbaseConnect,
     coinbaseDisconnect,
