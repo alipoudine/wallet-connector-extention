@@ -297,7 +297,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     coinbaseSwitchNetwork,
 
     metamaskProvider,
-    isMetamaskConnected,
     getMetamaskProvider,
     metamaskConnect,
     metamaskDisconnect,
