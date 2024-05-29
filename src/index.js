@@ -62,8 +62,8 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
   const isCoinBaseConnected = async () => {
     try {
-      if (coinbaseProvider && coinbaseProvider.selectedAddress) {
-        return coinbaseProvider.selectedAddress;
+      if (coinbaseProvider && coinbaseProvider.accounts.length > 0) {
+        return coinbaseProvider.accounts[0];
       } else {
         const accounts = await coinbaseProvider.request({ method: "eth_accounts" });
         if (accounts && accounts.length > 0) {
