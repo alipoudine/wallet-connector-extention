@@ -177,18 +177,31 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
   const metamaskConnect = async () => {
     try {
-      const accounts = await metamaskProvider.request({
-        method: "eth_requestAccounts",
-      });
-      if (!accounts || accounts.length <= 0) {
-        throw new Error("wallet address not selected");
+      // Check if MetaMask is already connected by checking existing accounts
+      const existingAccounts = await metamaskProvider.request({ method: 'eth_accounts' });
+  
+      let accounts;
+      if (existingAccounts && existingAccounts.length > 0) {
+        // MetaMask is already connected
+        // accounts = existingAccounts;
+        accounts = await metamaskProvider.request({ method: 'eth_requestAccounts' });
+      } else {
+        // MetaMask is not connected, request accounts
+        accounts = await metamaskProvider.request({ method: 'eth_requestAccounts' });
       }
-      const account = getNormalizeAddress(accounts);
+  
+      if (!accounts || accounts.length <= 0) {
+        throw new Error('wallet address not selected');
+      }
+  
+      const account = getNormalizeAddress(accounts[0]);
       return { account };
     } catch (error) {
+      console.error('MetaMask connection error:', error);
       return error;
     }
   };
+  
 
   const metamaskChainId = async () => {
     try {
