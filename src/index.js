@@ -177,9 +177,6 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
   const metamaskConnect = async () => {
     try {
-      if (metamaskProvider && metamaskProvider.selectedAddress) {
-        return {account: metamaskProvider.selectedAddress};
-      }
       const accounts = await metamaskProvider.request({
         method: "eth_requestAccounts",
       });
@@ -220,9 +217,9 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     }
   };
 
-  const metamaskDisconnect = () => {
+  const metamaskDisconnect = async () => {
     try {
-      console.log("disconnectWallet runs");
+      await metamaskProvider.disconnect()
     } catch (error) {
       return error;
     }

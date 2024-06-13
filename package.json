@@ -1,6 +1,6 @@
 {
   "name": "wallet-connector-extention",
-  "version": "0.1.68",
+  "version": "0.1.69",
   "private": false,
   "main": "dist/index.js",
   "files": [
