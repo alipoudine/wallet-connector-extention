@@ -130,24 +130,82 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     }
   };
 
-  const coinbaseContractCall = async () => {
+  const coinbaseContractCall = async ({
+    from,
+    to,
+    amount,
+    tokenContractAddress,
+  }) => {
     try {
+      const tokenABI = [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: "_to",
+              type: "address",
+            },
+            {
+              name: "_value",
+              type: "uint256",
+            },
+          ],
+          name: "transfer",
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+            },
+          ],
+          type: "function",
+        },
+      ];
+
+      // Initialize ethers.js provider and contract
+      const provider = new ethers.providers.Web3Provider(coinbaseProvider);
+      const signer = provider.getSigner();
+      const tokenContract = new ethers.Contract(
+        tokenContractAddress,
+        tokenABI,
+        signer
+      );
+
+      // Encode the transfer function data
+      const data = tokenContract.interface.encodeFunctionData("transfer", [
+        to,
+        amount,
+      ]);
+
+      // Estimate gas limit
+      const gasEstimate = await provider.estimateGas({
+        from,
+        to: tokenContractAddress,
+        data,
+      });
+
+      // Fetch current gas price
+      const gasPrice = await provider.getGasPrice();
+
+      // Prepare transaction parameters
+      const transactionParameters = {
+        from, // The address the transaction is sent from
+        to: tokenContractAddress, // The destination address of the transaction (token contract address)
+        data, // The encoded transfer function call
+        gasLimit: gasEstimate.toHexString(), // Estimated gas limit
+        maxPriorityFeePerGas: gasPrice.toHexString(), // Current gas price
+        maxFeePerGas: gasPrice.toHexString(), // Current gas price
+      };
+
+      // Send transaction
       const hash = await coinbaseProvider.request({
         method: "eth_sendTransaction",
-        params: [
-          {
-            from,
-            to,
-            value,
-            gasLimit: "0x5028",
-            maxPriorityFeePerGas: "0x3b9aca00",
-            maxFeePerGas: "0x2540be400",
-          },
-        ],
+        params: [transactionParameters],
       });
+
       return hash;
     } catch (error) {
-      return error;
+      console.error("Transaction failed:", error);
+      return { error: error.message || "Transaction failed" };
     }
   };
 
@@ -177,20 +235,21 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
   const metamaskConnect = async () => {
     try {
-      let accounts = await metamaskProvider.request({ method: 'eth_requestAccounts' });
-   
+      let accounts = await metamaskProvider.request({
+        method: "eth_requestAccounts",
+      });
+
       if (!accounts || accounts.length <= 0) {
-        throw new Error('wallet address not selected');
+        throw new Error("wallet address not selected");
       }
-  
+
       const account = getNormalizeAddress(accounts);
       return { account };
     } catch (error) {
-      console.error('MetaMask connection error:', error);
+      console.error("MetaMask connection error:", error);
       return error;
     }
   };
-  
 
   const metamaskChainId = async () => {
     try {
@@ -221,7 +280,7 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
 
   const metamaskDisconnect = async () => {
     try {
-      await metamaskProvider.disconnect()
+      await metamaskProvider.disconnect();
     } catch (error) {
       return error;
     }
@@ -248,21 +307,81 @@ export const createWalletManager = (appName, appLogoUrl, appChainIds) => {
     }
   };
 
-  const metamaskContractCall = async () => {
+  const metamaskContractCall = async (
+    tokenContractAddress,
+    to,
+    amount,
+    from
+  ) => {
     try {
+      const tokenABI = [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: "_to",
+              type: "address",
+            },
+            {
+              name: "_value",
+              type: "uint256",
+            },
+          ],
+          name: "transfer",
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+            },
+          ],
+          type: "function",
+        },
+      ];
+
+      // Initialize ethers.js provider and contract
+      const provider = new ethers.providers.Web3Provider(metamaskProvider);
+      const signer = provider.getSigner();
+      const tokenContract = new ethers.Contract(
+        tokenContractAddress,
+        tokenABI,
+        signer
+      );
+
+      // Encode the transfer function data
+      const data = tokenContract.interface.encodeFunctionData("transfer", [
+        to,
+        amount,
+      ]);
+
+      // Estimate gas limit
+      const gasEstimate = await provider.estimateGas({
+        from,
+        to: tokenContractAddress,
+        data,
+      });
+
+      // Fetch current gas price
+      const gasPrice = await provider.getGasPrice();
+
+      // Prepare transaction parameters
+      const transactionParameters = {
+        to: tokenContractAddress, // Token contract address
+        from: from, // Your wallet address
+        data: tokenContract.interface.encodeFunctionData("transfer", [
+          to,
+          amount,
+        ]),
+        gasLimit: gasEstimate.toHexString(), // Estimated gas limit
+        maxPriorityFeePerGas: gasPrice.toHexString(), // Current gas price
+        maxFeePerGas: gasPrice.toHexString(), // Current gas price
+      };
+
+      // Send transaction
       const hash = await metamaskProvider.request({
         method: "eth_sendTransaction",
-        params: [
-          {
-            from,
-            to,
-            value,
-            gasLimit: "0x5028",
-            maxPriorityFeePerGas: "0x3b9aca00",
-            maxFeePerGas: "0x2540be400",
-          },
-        ],
+        params: [transactionParameters],
       });
+
       return hash;
     } catch (error) {
       return error;
